@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import router from './routes/users';
+import userRouter from './routes/users';
+import cardRouter from './routes/cards';
 import auth from './middlewares/auth';
 
 const { PORT = 3000 } = process.env;
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use(auth);
 
-app.post('/users', router);
+app.use('/users', userRouter);
+app.use('/cards', cardRouter);
 
 app.listen(PORT);
