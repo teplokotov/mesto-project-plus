@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import auth from './middlewares/auth';
+import errors from './middlewares/errors';
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -16,5 +17,7 @@ app.use(auth);
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+
+app.use(errors);
 
 app.listen(PORT);

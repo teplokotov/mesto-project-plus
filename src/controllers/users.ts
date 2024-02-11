@@ -1,24 +1,48 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 import User from '../models/user';
+import NotFoundError from '../errors/not-found-err';
+import BadRequestError from '../errors/bad-request-err';
 
-export const getUsers = (req: Request, res: Response) => User.find({})
+export const getUsers = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => User.find({})
   .then((users) => res.send(users))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при получении списка пользователей' }));
+  .catch(next);
 
-export const getUserById = (req: Request, res: Response) => User.findById(req.params.userId)
-  .then((user) => res.send(user))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при получении данных пользователя' }));
+export const getUserById = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => User.findById(req.params.userId)
+  .then((user) => {
+    if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
+    res.send(user);
+  })
+  .catch(next);
 
-export const createUser = (req: Request, res: Response) => User.create({
+export const createUser = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => User.create({
   name: req.body.name,
   about: req.body.about,
   avatar: req.body.avatar,
 })
   .then((user) => res.send(user))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при создании пользователя' }));
+  .catch((err) => {
+    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
+    next(err);
+  });
 
-export const updateUserInfo = (req: Request, res: Response) => User.findByIdAndUpdate(
+export const updateUserInfo = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => User.findByIdAndUpdate(
   req.body.user._id,
   {
     name: req.body.name,
@@ -26,13 +50,29 @@ export const updateUserInfo = (req: Request, res: Response) => User.findByIdAndU
   },
   { new: true },
 )
-  .then((user) => res.send(user))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при обновлении данных пользователя' }));
+  .then((user) => {
+    if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
+    res.send(user);
+  })
+  .catch((err) => {
+    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
+    next(err);
+  });
 
-export const updateUserAvatar = (req: Request, res: Response) => User.findByIdAndUpdate(
+export const updateUserAvatar = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => User.findByIdAndUpdate(
   req.body.user._id,
   { avatar: req.body.avatar },
   { new: true },
 )
-  .then((user) => res.send(user))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при обновлении аватара пользователя' }));
+  .then((user) => {
+    if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
+    res.send(user);
+  })
+  .catch((err) => {
+    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
+    next(err);
+  });

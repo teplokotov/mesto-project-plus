@@ -1,44 +1,75 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 import Card from '../models/card';
+import NotFoundError from '../errors/not-found-err';
+import BadRequestError from '../errors/bad-request-err';
 
-export const getCards = (req: Request, res: Response) => Card.find({})
+export const getCards = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => Card.find({})
   .then((cards) => res.send(cards))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при получении списка карточек' }));
+  .catch(next);
 
 export const deleteCardById = (
   req: Request,
   res: Response,
+  next: NextFunction,
 ) => Card.findByIdAndRemove(req.params.cardId)
   .then((card) => {
-    if (!card) {
-      res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-      return;
-    }
+    if (!card) throw new NotFoundError('Карточка с указанным _id не найдена.');
     res.send(card);
   })
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при получении данных пользователя' }));
+  .catch(next);
 
-export const createCard = (req: Request, res: Response) => Card.create({
+export const createCard = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => Card.create({
   name: req.body.name,
   link: req.body.link,
   owner: req.body.user._id,
 })
   .then((card) => res.send(card))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при создании карточки' }));
+  .catch((err) => {
+    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные при создании карточки.');
+    next(err);
+  });
 
-export const likeCard = (req: Request, res: Response) => Card.findByIdAndUpdate(
+export const likeCard = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => Card.findByIdAndUpdate(
   req.params.cardId,
   { $addToSet: { likes: req.body.user._id } }, // добавить _id в массив, если его там нет
   { new: true },
 )
-  .then((card) => res.send(card))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при поставки лайка' }));
+  .then((card) => {
+    if (!card) throw new NotFoundError('Передан несуществующий _id карточки.');
+    res.send(card);
+  })
+  .catch((err) => {
+    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные для постановки лайка.');
+    next(err);
+  });
 
-export const dislikeCard = (req: Request, res: Response) => Card.findByIdAndUpdate(
+export const dislikeCard = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => Card.findByIdAndUpdate(
   req.params.cardId,
   { $pull: { likes: req.body.user._id } }, // убрать _id из массива
   { new: true },
 )
-  .then((card) => res.send(card))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка при снятии лайка' }));
+  .then((card) => {
+    if (!card) throw new NotFoundError('Передан несуществующий _id карточки.');
+    res.send(card);
+  })
+  .catch((err) => {
+    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные для снятия лайка.');
+    next(err);
+  });
