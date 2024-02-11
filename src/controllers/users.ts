@@ -17,3 +17,22 @@ export const createUser = (req: Request, res: Response) => User.create({
 })
   .then((user) => res.send(user))
   .catch(() => res.status(500).send({ message: 'Произошла ошибка при создании пользователя' }));
+
+export const updateUserInfo = (req: Request, res: Response) => User.findByIdAndUpdate(
+  req.body.user._id,
+  {
+    name: req.body.name,
+    about: req.body.about,
+  },
+  { new: true },
+)
+  .then((user) => res.send(user))
+  .catch(() => res.status(500).send({ message: 'Произошла ошибка при обновлении данных пользователя' }));
+
+export const updateUserAvatar = (req: Request, res: Response) => User.findByIdAndUpdate(
+  req.body.user._id,
+  { avatar: req.body.avatar },
+  { new: true },
+)
+  .then((user) => res.send(user))
+  .catch(() => res.status(500).send({ message: 'Произошла ошибка при обновлении аватара пользователя' }));

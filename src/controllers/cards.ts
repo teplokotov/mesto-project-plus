@@ -26,3 +26,19 @@ export const createCard = (req: Request, res: Response) => Card.create({
 })
   .then((card) => res.send(card))
   .catch(() => res.status(500).send({ message: 'Произошла ошибка при создании карточки' }));
+
+export const likeCard = (req: Request, res: Response) => Card.findByIdAndUpdate(
+  req.params.cardId,
+  { $addToSet: { likes: req.body.user._id } }, // добавить _id в массив, если его там нет
+  { new: true },
+)
+  .then((card) => res.send(card))
+  .catch(() => res.status(500).send({ message: 'Произошла ошибка при поставки лайка' }));
+
+export const dislikeCard = (req: Request, res: Response) => Card.findByIdAndUpdate(
+  req.params.cardId,
+  { $pull: { likes: req.body.user._id } }, // убрать _id из массива
+  { new: true },
+)
+  .then((card) => res.send(card))
+  .catch(() => res.status(500).send({ message: 'Произошла ошибка при снятии лайка' }));
