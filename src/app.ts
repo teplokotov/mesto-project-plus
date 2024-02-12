@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
+import notFoundRoute from './routes/not-found';
 import auth from './middlewares/auth';
 import errors from './middlewares/errors';
 
@@ -20,6 +21,7 @@ app.use(auth);
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+app.use('*', notFoundRoute);
 
 app.use(errors);
 
