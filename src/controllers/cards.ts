@@ -33,9 +33,6 @@ export const createCard = (
     link: req.body.link,
     owner: req.body.user._id,
   },
-  {
-    runValidators: true,
-  },
 )
   .then((card) => res.send(card))
   .catch((err) => {

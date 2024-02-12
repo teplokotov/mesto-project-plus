@@ -33,9 +33,6 @@ export const createUser = (
     about: req.body.about,
     avatar: req.body.avatar,
   },
-  {
-    runValidators: true,
-  },
 )
   .then((user) => res.send(user))
   .catch((err) => {
