@@ -27,14 +27,20 @@ export const createUser = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => User.create({
-  name: req.body.name,
-  about: req.body.about,
-  avatar: req.body.avatar,
-})
+) => User.create(
+  {
+    name: req.body.name,
+    about: req.body.about,
+    avatar: req.body.avatar,
+  },
+  {
+    runValidators: true,
+  },
+)
   .then((user) => res.send(user))
   .catch((err) => {
-    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
+    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+    if (err.name === 'ValidationError') next(new BadRequestError(err.message));
     next(err);
   });
 
@@ -48,14 +54,18 @@ export const updateUserInfo = (
     name: req.body.name,
     about: req.body.about,
   },
-  { new: true },
+  {
+    new: true,
+    runValidators: true,
+  },
 )
   .then((user) => {
     if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
     res.send(user);
   })
   .catch((err) => {
-    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
+    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+    if (err.name === 'ValidationError') next(new BadRequestError(err.message));
     next(err);
   });
 
@@ -66,13 +76,17 @@ export const updateUserAvatar = (
 ) => User.findByIdAndUpdate(
   req.body.user._id,
   { avatar: req.body.avatar },
-  { new: true },
+  {
+    new: true,
+    runValidators: true,
+  },
 )
   .then((user) => {
     if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
     res.send(user);
   })
   .catch((err) => {
-    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
+    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+    if (err.name === 'ValidationError') next(new BadRequestError(err.message));
     next(err);
   });

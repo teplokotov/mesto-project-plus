@@ -27,14 +27,20 @@ export const createCard = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => Card.create({
-  name: req.body.name,
-  link: req.body.link,
-  owner: req.body.user._id,
-})
+) => Card.create(
+  {
+    name: req.body.name,
+    link: req.body.link,
+    owner: req.body.user._id,
+  },
+  {
+    runValidators: true,
+  },
+)
   .then((card) => res.send(card))
   .catch((err) => {
-    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные при создании карточки.');
+    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
+    if (err.name === 'ValidationError') next(new BadRequestError(err.message));
     next(err);
   });
 
@@ -52,7 +58,7 @@ export const likeCard = (
     res.send(card);
   })
   .catch((err) => {
-    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные для постановки лайка.');
+    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные для постановки лайка.'));
     next(err);
   });
 
@@ -70,6 +76,6 @@ export const dislikeCard = (
     res.send(card);
   })
   .catch((err) => {
-    if (err.name === 'CastError') throw new BadRequestError('Переданы некорректные данные для снятия лайка.');
+    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные для снятия лайка.'));
     next(err);
   });
