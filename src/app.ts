@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
@@ -9,6 +10,8 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.use(helmet());
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
