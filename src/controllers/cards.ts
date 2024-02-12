@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import Card from '../models/card';
 import NotFoundError from '../errors/not-found-err';
@@ -21,7 +22,10 @@ export const deleteCardById = (
     if (!card) throw new NotFoundError('Карточка с указанным _id не найдена.');
     res.send(card);
   })
-  .catch(next);
+  .catch((err) => {
+    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные.'));
+    next(err);
+  });
 
 export const createCard = (
   req: Request,
@@ -34,7 +38,7 @@ export const createCard = (
     owner: req.body.user._id,
   },
 )
-  .then((card) => res.send(card))
+  .then((card) => res.status(StatusCodes.CREATED).send(card))
   .catch((err) => {
     if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
     if (err.name === 'ValidationError') next(new BadRequestError(err.message));

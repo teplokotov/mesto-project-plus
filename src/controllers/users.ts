@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-err';
@@ -21,7 +22,10 @@ export const getUserById = (
     if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
     res.send(user);
   })
-  .catch(next);
+  .catch((err) => {
+    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные.'));
+    next(err);
+  });
 
 export const createUser = (
   req: Request,
@@ -34,7 +38,7 @@ export const createUser = (
     avatar: req.body.avatar,
   },
 )
-  .then((user) => res.send(user))
+  .then((user) => res.status(StatusCodes.CREATED).send(user))
   .catch((err) => {
     if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
     if (err.name === 'ValidationError') next(new BadRequestError(err.message));

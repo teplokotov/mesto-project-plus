@@ -1,4 +1,6 @@
-const ERROR_CODE = 400;
+import { StatusCodes } from 'http-status-codes';
+
+const ERROR_CODE = StatusCodes.BAD_REQUEST;
 
 class BadRequestError extends Error {
   statusCode: number;

@@ -1,4 +1,6 @@
-const ERROR_CODE = 404;
+import { StatusCodes } from 'http-status-codes';
+
+const ERROR_CODE = StatusCodes.NOT_FOUND;
 
 class NotFoundError extends Error {
   statusCode: number;
