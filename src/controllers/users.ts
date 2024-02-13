@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import bcrypt from 'bcrypt';
 
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-err';
@@ -31,18 +32,26 @@ export const createUser = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => User.create(
-  {
-    name: req.body.name,
-    about: req.body.about,
-    avatar: req.body.avatar,
-  },
-)
-  .then((user) => res.status(StatusCodes.CREATED).send(user))
-  .catch((err) => {
-    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-    if (err.name === 'ValidationError') next(new BadRequestError(err.message));
-    next(err);
+) => bcrypt.hash(req.body.password, 10)
+  .then((hash) => {
+    User.create(
+      {
+        name: req.body.name,
+        about: req.body.about,
+        avatar: req.body.avatar,
+        email: req.body.email,
+        password: hash,
+      },
+    )
+      .then((user) => {
+        const { password, ...rest } = JSON.parse(JSON.stringify(user));
+        res.status(StatusCodes.CREATED).send(rest);
+      })
+      .catch((err) => {
+        if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+        if (err.name === 'ValidationError') next(new BadRequestError(err.message));
+        next(err);
+      });
   });
 
 export const updateUserInfo = (
