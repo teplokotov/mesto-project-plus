@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-err';
 import BadRequestError from '../errors/bad-request-err';
+import UnAuthError from '../errors/unauth-err';
 
 export const getUsers = (
   req: Request,
@@ -98,5 +100,28 @@ export const updateUserAvatar = (
   .catch((err) => {
     if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
     if (err.name === 'ValidationError') next(new BadRequestError(err.message));
+    next(err);
+  });
+
+export const login = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => User.findUserByCredentials(req.body.email, req.body.password)
+  .then((user) => {
+    const token = jwt.sign(
+      { _id: user._id },
+      'secret-key',
+      { expiresIn: '7d' },
+    );
+    res.cookie('access-token', token, {
+      maxAge: 1000 * 60 * 15, // 15 minutes
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: true,
+    });
+  })
+  .catch((err) => {
+    if (err.name === 'CastError') next(new UnAuthError(err.message));
     next(err);
   });
