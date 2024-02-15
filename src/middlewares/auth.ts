@@ -1,9 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import UnAuthError from '../errors/unauth-err';
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
-  req.body.user = {
-    _id: '65c632e4a4553586862e0653',
-  };
+  // Get token from header
+  // const { authorization } = req.headers;
+
+  // Get token from cookies
+  const authorization = req.cookies['access-token'];
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    throw new UnAuthError('Необходима авторизация');
+  }
+
+  const token = authorization.replace('Bearer ', '');
+  let payload;
+
+  try {
+    payload = jwt.verify(token, 'secret-key');
+  } catch (err) {
+    next(new UnAuthError('Необходима авторизация'));
+  }
+
+  req.body.user = payload; // { _id: string; iat: number; exp: number }
 
   next();
 };

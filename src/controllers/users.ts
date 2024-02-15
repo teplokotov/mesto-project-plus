@@ -114,12 +114,18 @@ export const login = (
       'secret-key',
       { expiresIn: '7d' },
     );
-    res.cookie('access-token', token, {
+
+    // Send token over cookie
+    res.cookie('access-token', `Bearer ${token}`, {
       maxAge: 1000 * 60 * 15, // 15 minutes
       httpOnly: true,
       sameSite: 'strict',
-      secure: true,
+      // secure: true,
     });
+    res.status(StatusCodes.OK).send({ success: 'true' });
+
+    // Send token in body
+    // res.status(StatusCodes.OK).send({ token });
   })
   .catch((err) => {
     if (err.name === 'CastError') next(new UnAuthError(err.message));

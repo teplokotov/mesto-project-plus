@@ -64,6 +64,7 @@ const userSchema = new Schema<IUser, UserModel>(
 
 userSchema.static('findUserByCredentials', function findUserByCredentials(email: string, password: string) {
   return this.findOne({ email })
+    .select('+password') // По умолчанию в схеме user мы запретили возвращать хеш пароля, однако, здесь требуем вернуть password
     .then((user) => {
       if (!user) return Promise.reject(new Error('Неправильные почта или пароль'));
 
