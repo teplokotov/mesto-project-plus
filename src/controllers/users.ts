@@ -7,6 +7,7 @@ import User from '../models/user';
 import NotFoundError from '../errors/not-found-err';
 import BadRequestError from '../errors/bad-request-err';
 import UnAuthError from '../errors/unauth-err';
+import ConflictError from '../errors/conflict-err';
 
 export const getUsers = (
   req: Request,
@@ -55,6 +56,7 @@ export const createUser = (
       .catch((err) => {
         if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
         if (err.name === 'ValidationError') next(new BadRequestError(err.message));
+        if (err.code === 11000) next(new ConflictError('Такой пользователь уже существует'));
         next(err);
       });
   });
