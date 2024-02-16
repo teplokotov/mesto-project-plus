@@ -20,15 +20,18 @@ export const getUserById = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => User.findById(req.params.userId)
-  .then((user) => {
-    if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
-    res.send(user);
-  })
-  .catch((err) => {
-    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные.'));
-    next(err);
-  });
+) => {
+  const _id = req.params.userId === 'me' ? req.body.user._id : req.params.userId;
+  return User.findById(_id)
+    .then((user) => {
+      if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные.'));
+      next(err);
+    });
+};
 
 export const createUser = (
   req: Request,
