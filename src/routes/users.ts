@@ -5,12 +5,17 @@ import {
   updateUserInfo,
   updateUserAvatar,
 } from '../controllers/users';
+import {
+  getUserByIdValidator,
+  updateUserAvatarValidator,
+  updateUserInfoValidator,
+} from '../validation/users';
 
 const userRouter = Router();
 userRouter.get('/', getUsers);
-userRouter.get('/:userId', getUserById);
-userRouter.get('/me', getUserById);
-userRouter.patch('/me', updateUserInfo);
-userRouter.patch('/me/avatar', updateUserAvatar);
+userRouter.get('/:userId', getUserByIdValidator, getUserById);
+userRouter.get('/me', getUserByIdValidator, getUserById);
+userRouter.patch('/me', updateUserInfoValidator, updateUserInfo);
+userRouter.patch('/me/avatar', updateUserAvatarValidator, updateUserAvatar);
 
 export default userRouter;

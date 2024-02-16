@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
-import validator from 'validator';
+import regExpURL from '../utils/constants';
+// import validator from 'validator';
 
 interface ICard {
   name: String;
@@ -20,7 +21,8 @@ const cardSchema = new Schema<ICard>(
     link: {
       type: String,
       validate: {
-        validator: (url: string) => validator.isURL(url),
+        // validator: (url: string) => validator.isURL(url),
+        validator: (url: string) => regExpURL.test(url),
         message: 'Некорректный URL',
       },
       required: [true, 'поле должно быть заполнено'],
