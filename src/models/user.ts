@@ -2,8 +2,8 @@ import {
   Model, Document, model, Schema,
 } from 'mongoose';
 import bcrypt from 'bcrypt';
+import validator from 'validator';
 import regExpURL from '../utils/constants';
-// import validator from 'validator';
 
 interface IUser {
   name?: String;
