@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
+import { Schema } from 'mongoose';
 import Card from '../models/card';
 import NotFoundError from '../errors/not-found-err';
 import BadRequestError from '../errors/bad-request-err';
+import UnAuthError from '../errors/unauth-err';
 
 export const getCards = (
   req: Request,
@@ -17,10 +19,12 @@ export const deleteCardById = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => Card.findByIdAndRemove(req.params.cardId)
+) => Card.findById(req.params.cardId)
   .then((card) => {
     if (!card) throw new NotFoundError('Карточка с указанным _id не найдена.');
-    res.send(card);
+    if (card.owner.toString() !== req.body.user._id) throw new UnAuthError('Можно удалять только свои карточки');
+    card.remove()
+      .then(() => res.send(card));
   })
   .catch((err) => {
     if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные.'));
