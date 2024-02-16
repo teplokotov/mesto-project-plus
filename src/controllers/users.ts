@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import env from '../../config';
 
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-err';
@@ -116,7 +117,7 @@ export const login = (
   .then((user) => {
     const token = jwt.sign(
       { _id: user._id },
-      'secret-key',
+      env.JWT_SECRET,
       { expiresIn: '7d' },
     );
 

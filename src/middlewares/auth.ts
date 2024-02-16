@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import env from '../../config';
 import UnAuthError from '../errors/unauth-err';
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
@@ -17,7 +18,7 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'secret-key');
+    payload = jwt.verify(token, env.JWT_SECRET);
   } catch (err) {
     next(new UnAuthError('Необходима авторизация'));
   }
