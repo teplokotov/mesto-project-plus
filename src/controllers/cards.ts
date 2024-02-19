@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import Card from '../models/card';
 import NotFoundError from '../errors/not-found-err';
 import BadRequestError from '../errors/bad-request-err';
-import UnAuthError from '../errors/unauth-err';
+import ForbiddenError from '../errors/forbidden-err';
 
 export const getCards = (
   req: Request,
@@ -21,7 +21,7 @@ export const deleteCardById = (
 ) => Card.findById(req.params.cardId)
   .then((card) => {
     if (!card) throw new NotFoundError('Карточка с указанным _id не найдена.');
-    if (card.owner.toString() !== req.body.user._id) throw new UnAuthError('Можно удалять только свои карточки');
+    if (card.owner.toString() !== req.body.user._id) throw new ForbiddenError('Можно удалять только свои карточки');
     card.remove()
       .then(() => res.send(card));
   })

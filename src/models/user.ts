@@ -4,6 +4,7 @@ import {
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 import { regExpURL } from '../utils/constants';
+import UnAuthError from '../errors/unauth-err';
 
 interface IUser {
   name?: String;
@@ -68,11 +69,11 @@ userSchema.static('findUserByCredentials', function findUserByCredentials(email:
   return this.findOne({ email })
     .select('+password') // По умолчанию в схеме user мы запретили возвращать хеш пароля, однако, здесь требуем вернуть password
     .then((user) => {
-      if (!user) return Promise.reject(new Error('Неправильные почта или пароль'));
+      if (!user) return Promise.reject(new UnAuthError('Неправильные почта или пароль'));
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
-          if (!matched) return Promise.reject(new Error('Неправильные почта или пароль'));
+          if (!matched) return Promise.reject(new UnAuthError('Неправильные почта или пароль'));
 
           return user;
         });
