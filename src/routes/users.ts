@@ -13,8 +13,8 @@ import {
 
 const userRouter = Router();
 userRouter.get('/', getUsers);
+userRouter.get('/me', getUserById);
 userRouter.get('/:userId', getUserByIdValidator, getUserById);
-userRouter.get('/me', getUserByIdValidator, getUserById);
 userRouter.patch('/me', updateUserInfoValidator, updateUserInfo);
 userRouter.patch('/me/avatar', updateUserAvatarValidator, updateUserAvatar);
 

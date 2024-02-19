@@ -23,7 +23,7 @@ export const getUserById = (
   res: Response,
   next: NextFunction,
 ) => {
-  const _id = req.params.userId === 'me' ? req.body.user._id : req.params.userId;
+  const _id = req.params.userId === undefined ? req.body.user._id : req.params.userId;
   return User.findById(_id)
     .then((user) => {
       if (!user) throw new NotFoundError('Пользователь по указанному _id не найден.');
