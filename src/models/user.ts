@@ -3,7 +3,7 @@ import {
 } from 'mongoose';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
-import regExpURL from '../utils/constants';
+import { regExpURL } from '../utils/constants';
 
 interface IUser {
   name?: String;

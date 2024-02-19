@@ -12,6 +12,7 @@ import auth from './middlewares/auth';
 import errorsMiddleware from './middlewares/errors';
 import { createUser, login } from './controllers/users';
 import { errorLogger, requestLogger } from './middlewares/logger';
+import { limiter } from './utils/constants';
 
 const app = express();
 
@@ -19,6 +20,7 @@ mongoose.connect(env.DB_CONNECTION);
 
 app.use(helmet());
 app.use(cookieParser());
+app.use(limiter);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

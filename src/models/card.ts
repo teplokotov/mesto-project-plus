@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import regExpURL from '../utils/constants';
+import { regExpURL } from '../utils/constants';
 // import validator from 'validator';
 
 interface ICard {
