@@ -30,8 +30,8 @@ export const getUserById = (
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные.'));
-      next(err);
+      if (err.name === 'CastError') return next(new BadRequestError('Переданы некорректные данные.'));
+      return next(err);
     });
 };
 
@@ -55,10 +55,10 @@ export const createUser = (
         res.status(StatusCodes.CREATED).send(rest);
       })
       .catch((err) => {
-        if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-        if (err.name === 'ValidationError') next(new BadRequestError(err.message));
-        if (err.code === 11000) next(new ConflictError('Такой пользователь уже существует'));
-        next(err);
+        if (err.name === 'CastError') return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+        if (err.name === 'ValidationError') return next(new BadRequestError(err.message));
+        if (err.code === 11000) return next(new ConflictError('Такой пользователь уже существует'));
+        return next(err);
       });
   });
 
@@ -82,9 +82,9 @@ export const updateUserInfo = (
     res.send(user);
   })
   .catch((err) => {
-    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-    if (err.name === 'ValidationError') next(new BadRequestError(err.message));
-    next(err);
+    if (err.name === 'CastError') return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+    if (err.name === 'ValidationError') return next(new BadRequestError(err.message));
+    return next(err);
   });
 
 export const updateUserAvatar = (
@@ -104,9 +104,9 @@ export const updateUserAvatar = (
     res.send(user);
   })
   .catch((err) => {
-    if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-    if (err.name === 'ValidationError') next(new BadRequestError(err.message));
-    next(err);
+    if (err.name === 'CastError') return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+    if (err.name === 'ValidationError') return next(new BadRequestError(err.message));
+    return next(err);
   });
 
 export const login = (
@@ -134,6 +134,6 @@ export const login = (
     // res.status(StatusCodes.OK).send({ token });
   })
   .catch((err) => {
-    if (err.name === 'CastError') next(new UnAuthError(err.message));
-    next(err);
+    if (err.name === 'CastError') return next(new UnAuthError(err.message));
+    return next(err);
   });
